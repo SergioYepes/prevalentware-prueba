@@ -76,8 +76,15 @@ model Movement {
   concept String
   amount  Float
   date    DateTime
+  type    MovementType
+  userName String
   userId  String
   user    User     @relation(fields: [userId], references: [id])
 
   @@map("movements")
 }
+enum MovementType {
+  INGRESO
+  EGRESO
+}
+

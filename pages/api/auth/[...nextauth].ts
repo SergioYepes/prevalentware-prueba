@@ -1,7 +1,7 @@
 import NextAuth, { type NextAuthOptions, type User } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "../../../lib/prisma";
 
 export const authOptions: NextAuthOptions = {
@@ -58,13 +58,13 @@ export const authOptions: NextAuthOptions = {
     return true; // usuario nuevo -> lo crea el PrismaAdapter
     },
 
-    async session({ session, user }) {
-      if (session.user) {
-        (session.user as any).id = user.id;
-        (session.user as any).role = (user as any).role;
-      }
-      return session;
-    },
+     async session({ session, user }) {
+        if (session.user) {
+          session.user.id = user.id;
+          session.user.role = (user as any).role; 
+        }
+        return session;
+      },
   },
   events: {
     async createUser({ user }: { user: User }) {
@@ -77,6 +77,17 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: false,
+      },
+    },
   },
 };
 

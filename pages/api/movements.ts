@@ -1,35 +1,46 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '../../lib/prisma';
-import { requireAuth } from '../../lib/requireAuth';
+import type { NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "./auth/[...nextauth]";
+import { prisma } from "../../lib/prisma";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') {
-    const session = await requireAuth(req, res);
-    if (!session) return;
-    // Obtener todos los movimientos
-    const movements = await prisma.movement.findMany({
-      include: { user: true },
-    });
-    return res.status(200).json(movements);
+  const session = await getServerSession(req, res, authOptions);
+
+  if (!session) return res.status(401).json({ error: "Not authenticated" });
+
+  const userRole = (session.user as any).role || "USER";
+  const userId = (session.user as any).id;
+
+  if (req.method === "GET") {
+    const where = userRole === "ADMIN" ? {} : { userId };
+    const list = await prisma.movement.findMany({ where, orderBy: { date: "desc" } });
+    return res.json(list);
   }
-  if (req.method === 'POST') {
-    const session = await requireAuth(req, res, ['ADMIN']);
-    if (!session) return;
-    // Crear un nuevo movimiento
-    const { concept, amount, date, userId } = req.body;
+
+  if (req.method === "POST") {
+    // Solo ADMIN puede crear
+    if (userRole !== "ADMIN") return res.status(403).json({ error: "Forbidden" });
+
+    const { concept, amount, date, type, userId: formUserId, userName } = req.body;
+
     try {
-      const movement = await prisma.movement.create({
+      const record = await prisma.movement.create({
         data: {
           concept,
-          amount,
+          amount: Number(amount),
           date: new Date(date),
-          userId,
+          type,
+          userId: formUserId ?? userId,
+          userName,
         },
       });
-      return res.status(201).json(movement);
-    } catch (error) {
-      return res.status(400).json({ error: 'Error creando movimiento', details: error });
+      return res.status(201).json(record);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Failed to create movement" });
     }
   }
-  return res.status(405).json({ error: 'Método no permitido' });
+
+  res.setHeader("Allow", ["GET", "POST"]);
+  res.status(405).end();
 }
