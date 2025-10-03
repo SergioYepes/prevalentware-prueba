@@ -1,10 +1,19 @@
-export default function Layout({ children }: { children: React.ReactNode }) {
+import Sidebar from "./Sidebar";
+import { ReactNode } from "react";
+
+interface LayoutProps {
+  children: ReactNode;
+}
+
+export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <header className="p-4 bg-white shadow-md">
-        <h1 className="text-xl font-bold">Mi App</h1>
-      </header>
-      <main className="p-6">{children}</main>
+    <div className="flex min-h-screen">
+      <div className="w-64 bg-gray-900 text-white">
+        <Sidebar />
+      </div>
+      <main className="flex-1 p-6 bg-gray-100">
+        {children}
+      </main>
     </div>
-  )
+  );
 }

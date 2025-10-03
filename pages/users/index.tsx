@@ -31,6 +31,7 @@ export default function UsersPage() {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
+      credentials: "include"
     });
     if (res.ok) {
       const updated = await res.json();
@@ -50,8 +51,8 @@ export default function UsersPage() {
   return (
     <div className="p-6">
       <h1 className="text-xl font-bold mb-4">Gestión de Usuarios</h1>
-      <table className="min-w-full bg-white border">
-        <thead>
+      <table className="min-w-full bg-white border border-orange-500">
+        <thead className="bg-orange-700 border border-cyan-500 text-white">
           <tr>
             <th className="p-2 border">Nombre</th>
             <th className="p-2 border">Correo</th>
@@ -68,7 +69,7 @@ export default function UsersPage() {
               <td className="p-2">
                 <button
                   onClick={() => handleEdit(u)}
-                  className="px-3 py-1 bg-blue-600 text-white rounded"
+                  className="px-3 py-1 bg-cyan-600 text-white rounded"
                 >
                   Editar
                 </button>

@@ -1,0 +1,120 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Finance App API",
+    "version": "1.0.0",
+    "description": "API para gestión de movimientos, usuarios y reportes."
+  },
+  "paths": {
+    "/api/movements": {
+      "get": {
+        "summary": "Listar movimientos",
+        "description": "Devuelve todos los movimientos. Requiere sesión.",
+        "responses": {
+          "200": {
+            "description": "Lista de movimientos",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "id": "m1",
+                    "concept": "Venta",
+                    "amount": 1000,
+                    "date": "2025-01-01T00:00:00Z",
+                    "type": "INGRESO",
+                    "user": { "id": "u1", "name": "Alice" }
+                  }
+                ]
+              }
+            }
+          },
+          "401": { "description": "No autenticado" }
+        }
+      },
+      "post": {
+        "summary": "Crear movimiento",
+        "description": "Solo usuarios ADMIN pueden crear movimientos.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "concept": { "type": "string" },
+                  "amount": { "type": "number" },
+                  "date": { "type": "string", "format": "date-time" },
+                  "type": { "type": "string", "enum": ["INGRESO", "EGRESO"] }
+                },
+                "required": ["concept", "amount", "date", "type"]
+              },
+              "example": {
+                "concept": "Compra insumos",
+                "amount": 500,
+                "date": "2025-10-01T00:00:00Z",
+                "type": "EGRESO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Movimiento creado" },
+          "403": { "description": "Prohibido" },
+          "401": { "description": "No autenticado" }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "put": {
+        "summary": "Actualizar usuario",
+        "description": "Solo ADMIN puede actualizar datos de usuario.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "role": { "type": "string", "enum": ["ADMIN", "USER"] }
+                }
+              },
+              "example": { "name": "Bob", "role": "USER" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Usuario actualizado" },
+          "401": { "description": "No autenticado" },
+          "403": { "description": "Prohibido" }
+        }
+      }
+    },
+    "/api/reports/csv": {
+      "get": {
+        "summary": "Exportar movimientos en CSV",
+        "description": "Devuelve todos los movimientos como CSV. Solo ADMIN.",
+        "responses": {
+          "200": {
+            "description": "Archivo CSV",
+            "content": {
+              "text/csv": {
+                "example": "concept,amount,date,user\nVenta,1000,2025-01-01,Alice"
+              }
+            }
+          },
+          "401": { "description": "No autenticado" },
+          "403": { "description": "Prohibido" }
+        }
+      }
+    }
+  }
+}

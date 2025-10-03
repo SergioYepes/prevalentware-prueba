@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Button } from "../../components/Button";
@@ -11,6 +11,7 @@ interface Movement {
   amount: number;
   date: string;
   userName: string;
+  type?: "INGRESO" | "EGRESO";
 }
 
 export default function MovementsPage() {
@@ -41,18 +42,24 @@ export default function MovementsPage() {
 
     fetchMovements();
   }, [status]);
-
+  
+console.log(movements);
   if (status === "loading") return <p>Cargando sesión...</p>;
   if (!session) return <p>No estás autenticado</p>;
 
+    const availableAmount = movements.reduce((acc, m) => {
+    if (m.type === "EGRESO") return acc - m.amount;
+    return acc + m.amount;
+  }, 0);
+
   return (
     <div className="container mx-auto py-8">
-      <Card>
+      <Card className="border border-orange-500">
         <CardHeader className="flex justify-between items-center">
-          <CardTitle>Movimientos</CardTitle>
+          <CardTitle className="underline text-2xl">Movimientos</CardTitle>
           {isAdmin && (
             <Link href="/movements/new">
-              <Button>Nuevo Movimiento</Button>
+              <Button className="bg-cyan-600 hover:bg-cyan-700">Nuevo Movimiento</Button>
             </Link>
           )}
         </CardHeader>
@@ -60,34 +67,46 @@ export default function MovementsPage() {
           {loading ? (
             <p>Cargando...</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Concepto</TableHead>
-                  <TableHead>Monto</TableHead>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead>Usuario</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {movements.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center">
-                      No hay movimientos registrados
-                    </TableCell>
+              <>
+              <Table className="border border-orange-500">
+                <TableHeader>
+                  <TableRow className="border-b border-orange-500">
+                    <TableHead>Concepto</TableHead>
+                    <TableHead>Monto</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Usuario</TableHead>
                   </TableRow>
-                ) : (
-                  movements.map((m) => (
-                    <TableRow key={m.id}>
-                      <TableCell>{m.concept}</TableCell>
-                      <TableCell>${m.amount.toLocaleString()}</TableCell>
-                      <TableCell>{new Date(m.date).toLocaleDateString()}</TableCell>
-                      <TableCell>{m.userName || "N/A"}</TableCell>
+                </TableHeader>
+                <TableBody>
+                  {movements.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center border border-orange-500">
+                        No hay movimientos registrados
+                      </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                  ) : (
+                    movements.map((m) => (
+                      <TableRow key={m.id} className="border-b border-orange-500">
+                        <TableCell className="border-r border-orange-500">{m.concept}</TableCell>
+                        <TableCell className="border-r border-orange-500">
+                          ${m.amount.toLocaleString()}
+                        </TableCell>
+                        <TableCell className="border-r border-orange-500">
+                          {new Date(m.date).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>{m.userName || "N/A"}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+              <div className="mt-6 text-right font-bold text-lg border-t border-orange-500 pt-4">
+                Monto disponible:{" "}
+                <span className={availableAmount < 0 ? "text-red-600" : "text-green-600"}>
+                  ${availableAmount.toLocaleString()}
+                </span>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

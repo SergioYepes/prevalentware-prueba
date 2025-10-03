@@ -11,11 +11,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const userRole = (session.user as any).role || "USER";
   const userId = (session.user as any).id;
 
-  if (req.method === "GET") {
-    const where = userRole === "ADMIN" ? {} : { userId };
-    const list = await prisma.movement.findMany({ where, orderBy: { date: "desc" } });
-    return res.json(list);
-  }
+if (req.method === "GET") {
+  const list = await prisma.movement.findMany({
+    orderBy: { date: "desc" },
+    include: { user: true },
+  });
+  return res.json(list);
+}
+
 
   if (req.method === "POST") {
     // Solo ADMIN puede crear
