@@ -24,7 +24,7 @@ function AppContent({ Component, pageProps }: { Component: AppProps["Component"]
   }
 
   if (!session) {
-    return null;
+    return <Component {...pageProps} />;
   }
 
   return (
