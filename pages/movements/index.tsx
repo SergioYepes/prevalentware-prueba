@@ -1,4 +1,3 @@
-// pages/movements.tsx
 import React from "react";
 import { useMovements } from "../../hooks/useMovements";
 import { useSession } from "next-auth/react";
@@ -8,7 +7,7 @@ export default function MovementsPage() {
   const { data: session } = useSession();
 
   if (!session) return <p className="p-6">Debes iniciar sesión</p>;
-  if ((session.user as any).role !== "ADMIN")
+  if (session.user.role !== "ADMIN")
     return <p className="p-6">Acceso denegado</p>;
 
   return (
