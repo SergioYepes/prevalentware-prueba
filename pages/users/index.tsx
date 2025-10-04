@@ -45,7 +45,7 @@ export default function UsersPage() {
   };
 
   if (!session) return <p className="p-6">Debes iniciar sesión</p>;
-  if ((session.user as any).role !== "ADMIN")
+  if (session.user.role !== "ADMIN")
     return <p className="p-6">Acceso denegado</p>;
 
   return (

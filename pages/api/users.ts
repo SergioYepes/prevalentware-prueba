@@ -13,13 +13,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   if (req.method === 'POST') {
     // Crear un nuevo usuario (solo ejemplo, falta validación y control de roles)
-    const { name, email, phone } = req.body;
+    const { name, email } = req.body;
     try {
       const user = await prisma.user.create({
         data: {
           name,
           email,
-          phone,
           role: 'ADMIN', // Por defecto ADMIN para pruebas
         },
       });

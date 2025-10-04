@@ -5,8 +5,9 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   testMatch: ["**/__tests__/**/*.(test|spec).(ts|tsx)"],
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/$1",
-  },
+      "^@/(.*)$": "<rootDir>/$1", 
+      "\\.(css|scss|sass)$": "identity-obj-proxy", 
+    },
   transform: {
     "^.+\\.(t|j)sx?$": ["ts-jest"],
   },

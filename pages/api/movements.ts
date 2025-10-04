@@ -8,8 +8,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (!session) return res.status(401).json({ error: "Not authenticated" });
 
-  const userRole = (session.user as any).role || "USER";
-  const userId = (session.user as any).id;
+  const userRole = session.user.role || "USER";
+  const userId = session.user.id;
 
 if (req.method === "GET") {
   const list = await prisma.movement.findMany({

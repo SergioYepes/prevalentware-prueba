@@ -8,7 +8,7 @@ export async function requireAuth(req: NextApiRequest, res: NextApiResponse, all
     res.status(401).json({ error: 'No autenticado' });
     return null;
   }
-  if (allowedRoles.length > 0 && !allowedRoles.includes((session.user as any).role)) {
+  if (allowedRoles.length > 0 && !allowedRoles.includes(session.user.role)) {
     res.status(403).json({ error: 'No autorizado' });
     return null;
   }

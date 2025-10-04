@@ -1,12 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth";
+import { getServerSession, DefaultUser } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]";
 import { prisma } from "../../../lib/prisma";
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      role: string;
+    } & DefaultUser;
+  }
+
+  interface User extends DefaultUser {
+    role: string;
+  }
+}
+
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions);
 
-  if (!session || (session.user as any).role !== "ADMIN") {
+  if (!session || session.user.role !== "ADMIN") {
     return res.status(403).end();
   }
 
@@ -14,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const csv = [
     ["concept", "amount", "date", "userEmail"],
-    ...rows.map((r: any) => [
+    ...rows.map((r) => [
       r.concept,
       r.amount,
       r.date.toISOString(),

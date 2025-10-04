@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  const role = (session.user as any).role;
+  const role = session.user.role;
   if (role !== "ADMIN") {
     return res.status(403).json({ error: "Forbidden" });
   }

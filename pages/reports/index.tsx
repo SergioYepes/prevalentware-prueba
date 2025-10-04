@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import Link from "next/link";
 
 type Movement = {
   id: number;
@@ -38,7 +39,7 @@ export default function ReportsPage() {
   }, []);
 
   if (!session) return <p className="p-6">Debes iniciar sesión</p>;
-  if ((session.user as any).role !== "ADMIN")
+  if (session.user.role !== "ADMIN")
     return <p className="p-6">Acceso denegado</p>;
 
   return (
@@ -63,12 +64,12 @@ export default function ReportsPage() {
         </ResponsiveContainer>
       </div>
 
-      <a
+      <Link
         href="/api/reports/csv"
         className="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
       >
         Descargar CSV
-      </a>
+      </Link>
     </div>
   );
 }
