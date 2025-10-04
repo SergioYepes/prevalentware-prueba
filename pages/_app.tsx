@@ -5,7 +5,11 @@ import { useRouter } from "next/router";
 import "../styles/global.css";
 import Layout from "../components/Layout";
 
-function AppContent({ Component, pageProps }: { Component: AppProps["Component"]; pageProps: any }) {
+type PagePropsWithSession = AppProps["pageProps"] & {
+  session?: unknown;
+};
+
+function AppContent({ Component, pageProps }: { Component: AppProps["Component"]; pageProps: PagePropsWithSession }) {
   const { data: session, status } = useSession({ required: false });
   const router = useRouter();
 
